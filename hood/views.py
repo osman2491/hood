@@ -48,3 +48,10 @@ def index(request):
     date = dt.date.today()
     hoods = Neighbourhood.objects.all()
     return render(request, 'index.html',{"date":date, "hoods":hoods})
+
+def profile(request):
+    date = dt.date.today()
+    current_user = request.user
+    profile = Profile.objects.get(user=current_user.id)
+    hoods = Neighbourhood.objects.all()
+    return render(request, 'profile/profile.html', {"date": date, "profile":profile,"hoods":hoods})
