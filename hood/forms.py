@@ -29,3 +29,8 @@ class BusinessForm(forms.ModelForm):
     class Meta:
             model = Business
             exclude = ['neighbourhood', 'profile']
+
+class NewCommentForm(forms.ModelForm):
+  class Meta:
+    model = Comment
+    exclude = ['post','postername','pub_date']
