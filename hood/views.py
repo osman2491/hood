@@ -133,3 +133,41 @@ def post_new(request,id):
     else:
         form = PostForm()
         return render(request,'new_post.html',{"form":form,"posts":posts,"hood":hood,  "date":date, 'comments':comments})
+
+
+def newcomment(request,id):
+    current_user = request.user
+
+    try:
+        comments = Comment.objects.filter(post_id=id)
+    except:
+        comments = []
+    brush= Post.objects.get(id=id)
+    if request.method =="POST":
+        form = NewCommentForm(request.POST,request.FILES)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.postername = current_user
+            comment.post = brush
+            comment.save()
+    else:
+        form = NewCommentForm()
+
+    return render(request, 'newcomment.html',{'brush':brush,"comments":comments,"form":form})
+
+def post_business(request,id):
+    date = dt.date.today()
+    hood=Neighbourhood.objects.get(id=id)
+    business = Business.objects.filter(neighbourhood=hood)
+    form = BusinessForm()
+    if request.method == 'POST':
+        form = BusinessForm(request.POST, request.FILES)
+        if form.is_valid():
+            business = form.save(commit=False)
+            business.profile = request.user.profile
+            business.neighbourhood = hood
+            business.save()
+            return redirect('index')
+    else:
+        form = BusinessForm()
+        return render(request,'new_business.html',{"form":form,"business":business,"hood":hood,  "date":date})
