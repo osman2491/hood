@@ -64,3 +64,8 @@ class Business(models.Model):
     def search_by_name(cls,search_term):
         business = cls.objects.filter(title__icontains=search_term)
         return business
+
+class Post(models.Model):
+    user = models.ForeignKey(Profile, related_name='profile')
+    post = models.CharField(max_length=30)
+    neighbourhood = models.ForeignKey(Neighbourhood, related_name='posts')
