@@ -27,3 +27,22 @@ class Profile(models.Model):
     def get_profiles(cls):
         profiles = cls.objects.all()
         return profiles
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+class Neighbourhood(models.Model):
+    name = models.CharField(max_length = 300)
+    image = models.ImageField(upload_to='neighimage/', null=True)
+    admin = models.ForeignKey(Profile, related_name='hoods', null=True)
+    description = models.CharField(max_length = 300,default='My hood!!!')
+    def save_neighbourhood(self):
+        self.save()
+    def delete_neighbourhood(self):
+        self.delete()
