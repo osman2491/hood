@@ -83,3 +83,53 @@ def search_results(request):
     else:
         message = "You haven't searched for any term"
         return render(request, 'search.html',{"message":message})
+
+@login_required(login_url='/accounts/login/')
+def new_hood(request):
+    current_user = request.user
+    profile = Profile.objects.get(user=current_user)
+    if request.method == 'POST':
+        form = HoodForm(request.POST, request.FILES)
+        if form.is_valid():
+            hood = form.save(commit=False)
+            hood.user = current_user
+            hood.profile = profile
+            hood.save()
+        return redirect('index')
+    else:
+        form = HoodForm()
+    return render(request, 'new_hood.html', {"form": form})
+
+def maps(request):
+    date = dt.date.today()
+    return render(request, 'maps.html',{"date":date})
+
+@login_required(login_url='/accounts/login/')
+def hoods(request,id):
+    current_user=request.user
+    date = dt.date.today()
+    post=Neighbourhood.objects.get(id=id)
+
+    brushs = Post.objects.filter(neighbourhood=post)
+    business = Business.objects.filter(neighbourhood=post)
+    return render(request,'each_hood.html',{"post":post,"date":date,"brushs":brushs, "business":business})
+
+def post_new(request,id):
+    date = dt.date.today()
+    hood=Neighbourhood.objects.get(id=id)
+    posts = Post.objects.filter(neighbourhood=hood)
+    comments = Comment.objects.filter(post=id).order_by('-pub_date')
+
+    form = PostForm()
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user.profile
+            post.profile = profile
+            post.neighbourhood = hood
+            post.save()
+            return redirect('index')
+    else:
+        form = PostForm()
+        return render(request,'new_post.html',{"form":form,"posts":posts,"hood":hood,  "date":date, 'comments':comments})
